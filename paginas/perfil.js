@@ -1,12 +1,25 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Card } from "react-native-elements";
 import CabPrefeitura from "../components/CabPrefeituraLogo";
 import { logout } from "../http/axios";
 import stylesG from "../styles/styleGlobal";
+import axios from "../http/axios";
 
 export default function Perfil({ navigation }) {
-  const usuario = "Administrador(a)";
+  let [user, setUser] = useState({});
+  useEffect(() => {
+    const fetchUser = async () => {
+      await axios
+        .get("/me")
+        .then((response) => {
+          setUser(response.data.data);
+        })
+        .catch((err) => console.log(err.response?.message));
+    };
+    if (!user.id) fetchUser();
+  }, [user]);
+
   return (
     <View style={stylesG.container}>
       <CabPrefeitura />
@@ -16,7 +29,7 @@ export default function Perfil({ navigation }) {
           <Image source={{ uri: require("../assets/user-icon.png") }} style={stylesG.avatarUsuario} />
         </View>
 
-        <Text style={styles.identificacao}>{usuario}</Text>
+        <Text style={styles.identificacao}>{user.name}</Text>
         <Card.Divider />
 
         <TouchableOpacity style={styles.botao} onPress={logout}>
