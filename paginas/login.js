@@ -1,19 +1,18 @@
 import React, { useState } from "react";
 import { TextInput, SafeAreaView, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from "react-native";
 const avatar = require("../assets/logoEmblema.png");
-import axios from "../http/axios";
+import axios, { setUserToken } from "../http/axios";
 
 export default function Login({ navigation }) {
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
 
-  const ExisteEsseUsuario = async () => {
+  const HandleLogin = async () => {
     if (!usuario || !senha) return;
     await axios
       .post("/login", { username: usuario, password: senha })
       .then((response) => {
-        axios.defaults.headers["Authorization"] = response.data.data.access_token;
-        localStorage.setItem("api-token", response.data.data.access_token);
+        setUserToken(response.data.data.access_token);
         navigation.navigate("Rotas");
       })
       .catch((error) => alert(error?.response?.data?.error ?? "Usuário ou senha inválido"));
@@ -31,7 +30,7 @@ export default function Login({ navigation }) {
         <Text style={stylesG.text}>Senha</Text>
         <TextInput style={stylesG.Input} value={senha} secureTextEntry={true} onChangeText={setSenha} placeholder="Senha"></TextInput>
 
-        <TouchableOpacity style={stylesG.botao} onPress={ExisteEsseUsuario}>
+        <TouchableOpacity style={stylesG.botao} onPress={HandleLogin}>
           <Text style={stylesG.textoDoBotao}>Acessar</Text>
         </TouchableOpacity>
 

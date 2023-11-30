@@ -14,9 +14,19 @@ axiosInstance.interceptors.response.use(
     if (!err.response) return err;
     if (err.response.status != 401) return err;
     if (err.response.config?.url?.includes("/login")) return err;
-    localStorage.removeItem("api-token");
-    location.reload();
+    logout();
   }
 );
+
+export function logout() {
+  localStorage.removeItem("api-token");
+  location.reload();
+  axiosInstance.defaults.headers["Authorization"] = undefined;
+}
+
+export function setUserToken(token) {
+  localStorage.setItem("api-token", token);
+  axiosInstance.defaults.headers["Authorization"] = "Bearer " + token;
+}
 
 export default axiosInstance;
